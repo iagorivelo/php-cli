@@ -1,13 +1,22 @@
 <?php
 
-if($argc < 2)
+$options = getopt("hc:");
+
+if(array_key_exists("h", $options))
 {
-  echo "Modo de Uso: php cli.php <nome_do_controller>\n";
+  echo "Modo de Uso: php cli.php -c <nome_do_controller>\n";
+
+  exit(0);
+}
+
+if(!isset($options['c']))
+{
+  echo "Nome do controller não especificado. Use -c <nome_do_controller>\n";
 
   exit(1);
 }
 
-$controllerName     = $argv[1];
+$controllerName     = $options['c'];
 $controllerFileName = ucfirst($controllerName) . 'Controller.php';
 
 if(file_exists($controllerFileName))
