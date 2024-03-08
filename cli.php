@@ -18,3 +18,24 @@ if(file_exists($controllerFileName))
 }
 
 $nameController = ucfirst($controllerName) . "Controller";
+
+$controllerContent = <<<PHP
+<?php
+
+namespace {Diretorio do Controller}\Controller;
+
+use Laminas\Mvc\Controller\AbstractActionController;
+use Laminas\View\Model\ViewModel;
+
+class $nameController extends AbstractActionController
+{
+  public function indexAction()
+  {
+    return new ViewModel();
+  }
+}
+PHP;
+
+file_put_contents($controllerFileName, $controllerContent);
+
+echo "Controller '$controllerName' criado com sucesso.\n";
