@@ -1,22 +1,11 @@
 <?php
 
-$short = 'e:';
-$long  = [
-  'exec:'
-];
+if($argc < 2)
+{
+  echo "Modo de Uso: php cli.php <nome_do_controller>\n";
 
-$options = getopt($short, $long);
-$command = array_key_first($options);
-
-switch ($command) {
-  case 'e':
-  case 'exec':
-    exec("{$options[$command]}");
-
-    break;
-  
-  default:
-    echo 'Comando inválido.' . "\n";
-
-    break;
+  exit(1);
 }
+
+$controllerName     = $argv[1];
+$controllerFileName = ucfirst($controllerName) . 'Controller.php';
