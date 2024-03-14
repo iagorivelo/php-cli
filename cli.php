@@ -74,6 +74,85 @@ function createControllerFactory($nameController, $fluxo)
   echo "ControllerFactory $class criado com sucesso.\n";
 }
 
+function createModel($nameModel, $fluxo)
+{
+  $class              = ucfirst($nameModel) . "Manager";
+  $fluxo              = ucfirst($fluxo);
+  $modelFileName = __DIR__ . "/module/{$fluxo}/src/Service/{$class}.php";
+
+  if(file_exists($modelFileName))
+  {
+    echo "O model '$modelFileName' já existe.\n";
+
+    exit(1);
+  }
+
+  $modelContent = <<<PHP
+  <?php
+
+  namespace $fluxo\Service;
+
+  use Laminas\Db\Sql\{Sql, Where, Expression};
+  use Laminas\Paginator\Paginator;
+  use Laminas\Paginator\Adapter\DbSelect;
+
+  class $class
+  {
+    private \$bd;
+
+    public function __construct(Db \$db)
+    {
+      \$this->bd = \$db->bd;
+    }
+  }
+  PHP;
+
+  file_put_contents($modelFileName, $modelContent);
+
+  echo "Model $class criado com sucesso.\n";
+
+  createModelFactory($nameModel, $fluxo);
+}
+
+function createModelFactory($nameModel, $fluxo)
+{
+  $class         = ucfirst($nameModel) . "ManagerFactory";
+  $model         = ucfirst($nameModel) . "Manager";
+  $fluxo         = ucfirst($fluxo);
+  $modelFileName = __DIR__ . "/module/{$fluxo}/src/Service/Factory/{$class}.php";
+
+  if(file_exists($modelFileName))
+  {
+    echo "O factory $modelFileName já existe.\n";
+
+    exit(1);
+  }
+
+  $modelFactoryContent = <<<PHP
+  <?php
+
+  namespace $fluxo\Service\Factory;
+
+  use Interop\Container\ContainerInterface;
+  use Laminas\ServiceManager\Factory\FactoryInterface;
+  use $fluxo\Service\\$model;
+
+  class $class implements FactoryInterface
+  {
+    public function __invoke(ContainerInterface \$container, \$requestedName, array \$options = null)
+    {
+      \$db = \$container->get(Db::class);
+
+      return new $model(\$db);
+    }
+  }
+  PHP;
+
+  file_put_contents($modelFileName, $modelFactoryContent);
+  
+  echo "ManagerFactory $class criado com sucesso.\n";
+}
+
 $options = getopt("hc:m:f:");
 
 if(array_key_exists("h", $options))
@@ -105,6 +184,6 @@ if(isset($options['c']) && !empty($options['c']))
 
 if(isset($options['m']) && !empty($options['m']))
 {
-  // createModel($options['m']);
+  createModel($options['m'], $options['f']);
 }
 
